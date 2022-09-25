@@ -58,14 +58,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _setGender(Gender selectedGender) {
-    // 選択された性別のenumをgenderに代入
+    // 選択された性別のenumを_genderに代入
     setState(() {
       _gender = selectedGender;
     });
   }
 
   void _setRegion(int selectedRegion) {
-    // 選択された地域をgenderに代入
+    // 選択された地域を_regionに代入
     setState(() {
       _region = _regionNames[selectedRegion];
     });
@@ -146,12 +146,17 @@ class _MyHomePageState extends State<MyHomePage> {
         Padding(
           // 余白の幅やどこに付けるかを指定
           padding: const EdgeInsets.only(bottom: 25.0),
+          // 子Widgetを横に並べる
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // ラジオボタン
               Radio(
-                value: Gender.man,
+                // このラジをボタンを押した時にonChangedでvalueに入ってくる値
+                value: Gender.male,
+                // ここで設定した値（ここでは_gender）がvalueに設定した値（ここではGender.man）と一致する時、このラジオボタンがアクティブになる
                 groupValue: _gender,
+                // ボタンのON、OFFが変わるたびにこの関数を実行
                 onChanged: (Gender? value) {
                   if (value != null) {
                     _setGender(value);
@@ -160,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const Text('男'),
               Radio(
-                value: Gender.woman,
+                value: Gender.female,
                 groupValue: _gender,
                 onChanged: (Gender? value) {
                   if (value != null) {
@@ -259,7 +264,6 @@ class _MyHomePageState extends State<MyHomePage> {
               // 余白の幅やどこに付けるかを指定
               padding: const EdgeInsets.only(top: 6.0),
               // Widgetの内側に余白を作る
-              // The Bottom margin is provided to align the popup above the system navigation bar.
               margin: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
@@ -276,8 +280,8 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 enum Gender {
-  man,
-  woman,
+  male,
+  female,
   other,
   none,
 }
