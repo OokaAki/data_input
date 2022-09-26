@@ -154,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Radio(
                 // このラジをボタンを押した時にonChangedでvalueに入ってくる値
                 value: Gender.male,
-                // ここで設定した値（ここでは_gender）がvalueに設定した値（ここではGender.man）と一致する時、このラジオボタンがアクティブになる
+                // ここで設定した値（ここでは_gender）がvalueに設定した値（ここではGender.maile）と一致する時、このラジオボタンがアクティブになる
                 groupValue: _gender,
                 // ボタンのON、OFFが変わるたびにこの関数を実行
                 onChanged: (Gender? value) {
