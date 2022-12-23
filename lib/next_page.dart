@@ -1,8 +1,8 @@
+import 'package:data_input/gender_type.dart';
 import 'package:flutter/material.dart';
 
-import 'main.dart';
-
 class NextPage extends StatelessWidget {
+  // ↓前の画面から受け取った変数をこれに入れる
   final String name;
   final Gender gender;
   final String region;
@@ -32,7 +32,7 @@ class NextPage extends StatelessWidget {
             ),
             Text(
               // 渡した値に対応するテキストを表示する
-              genderString(gender),
+              gender.name,
               style: const TextStyle(
                 fontSize: 20,
               ),
@@ -47,21 +47,5 @@ class NextPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String genderString(Gender gender) {
-    // Genderの値に対応したテキストを返す
-    switch (gender) {
-      case Gender.male:
-        return '男';
-      case Gender.female:
-        return '女';
-      case Gender.other:
-        return 'その他';
-      case Gender.none:
-        return '入力なし';
-      default:
-        return '表示できません';
-    }
   }
 }
