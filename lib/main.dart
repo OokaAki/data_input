@@ -1,6 +1,8 @@
+import 'package:data_input/gender_type.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:data_input/next_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,8 +33,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // SharedPreferencesのインスタンスを取得。
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  // 保存されているnameをアプリ起動時に表示させるためのcontroller
+  final TextEditingController _nameCtrl = TextEditingController();
   // ピッカーで選択された項目をTextFormFieldに表示するためのcontroller
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _regionCtrl = TextEditingController();
   // TextFormFieldに入力された文字列
   String _name = '';
   // ラジオボタンで選択された性別
@@ -64,13 +70,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _setRegion(int selectedRegion) {
+  void _setRegion(String selectedRegion) {
     // 選択された地域を_regionに代入
     setState(() {
-      _region = _regionNames[selectedRegion];
+      _region = selectedRegion;
     });
-    // 選択肢た出身地のテキストをTextFormFieldに表示させる
-    _controller.value = TextEditingValue(text: _region);
+    // 選択した出身地のテキストをTextFormFieldに表示させる
+    _regionCtrl.value = TextEditingValue(text: _region);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // SharedPreferencesに保存されている値を取り出す
+    _getSavedData();
   }
 
   // 画面描画を書いているところ
@@ -99,6 +112,8 @@ class _MyHomePageState extends State<MyHomePage> {
               regionInputForm(),
               // 次へボタン
               nextButton(),
+              // 保存ボタン
+              saveButton(),
             ],
           ),
         ),
@@ -121,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // 余白の幅やどこに付けるかを指定
           padding: const EdgeInsets.only(bottom: 25.0),
           child: TextFormField(
+            controller: _nameCtrl,
             decoration: const InputDecoration(
               // 何も入力されていない時に表示するヒントテキスト
               hintText: '山田　太郎',
@@ -206,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: const EdgeInsets.only(bottom: 25.0),
           child: TextFormField(
             // ピッカーで選択した地域をTextFormFieldに表示させるためのcontrollerを設定
-            controller: _controller,
+            controller: _regionCtrl,
             decoration: const InputDecoration(
               // 何も入力されていない時に表示するヒントテキスト
               hintText: '関東',
@@ -220,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemExtent: 32.0,
                   // ピッカーの値が変化するたびに_setRegionを実行
                   onSelectedItemChanged: (int selectedItem) {
-                    _setRegion(selectedItem);
+                    _setRegion(_regionNames[selectedItem]);
                   },
                   // ピッカーの項目を設定
                   children: List<Widget>.generate(_regionNames.length, (int index) {
@@ -256,6 +272,19 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget saveButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: OutlinedButton(
+        child: const Text('保存'),
+        onPressed: () {
+          // 入力されたデータを保存
+          _saveData();
+        },
+      ),
+    );
+  }
+
   void _showDialog(Widget child) {
     showCupertinoModalPopup<void>(
         context: context,
@@ -277,11 +306,25 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ));
   }
-}
 
-enum Gender {
-  male,
-  female,
-  other,
-  none,
+  void _saveData() async {
+    final prefs = await _prefs;
+
+    // 入力された名前（_name）をnameというkeyとセットで保存
+    prefs.setString('name', _name);
+    prefs.setString('gender', _gender.code);
+    prefs.setString('region', _region);
+  }
+
+  void _getSavedData() async {
+    final prefs = await _prefs;
+
+    // _setTextメソッドで、取り出した値を_nameに代入
+    _setText(prefs.getString('name') ?? '');
+    // 取り出した値をTextEditingControllerでTextFormFieldに表示させる
+    _nameCtrl.value = TextEditingValue(text: _name);
+    final String genderCode = prefs.getString('gender') ?? '';
+    _setGender(GenderExtension.valueOf(genderCode));
+    _setRegion(prefs.getString('region') ?? '');
+  }
 }
